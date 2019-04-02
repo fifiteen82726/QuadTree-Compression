@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy as np
+import math
 
 class QT():
   def __init__(self, img, t):
@@ -12,7 +13,7 @@ class QT():
 
   def generate_image(self, image):
     img = Image.fromarray(image.astype(np.uint8))
-    img.save("file.jpg")
+    img.save("quantized-file.jpg")
 
   def helper(self, img):
     rows, cols = img.shape
@@ -47,7 +48,8 @@ class QT():
 
   def compute_mean_error(self, block):
     mean = np.mean(block)
-    error = self.mae(block, mean)
+    # error = self.mae(block, mean)
+    error = self.mean_absolute_error(block, mean)
 
     return (mean, error)
 
@@ -60,6 +62,16 @@ class QT():
         max_v = max(abs(block[i][j] - mean), max_v)
     return max_v
 
+  # Mean Absolute Error
+  def mean_absolute_error(self, block, mean):
+    rows, cols = block.shape
+    v = 0
+    for i in xrange(rows):
+      for j in xrange(cols):
+        v += abs(block[i][j] - mean)
+
+    return v / (rows * cols)
+
 image = Image.open('img/t1-gray.jpg').convert("L")
 img = np.asarray(image)
-QT(img, 3).compress()
+QT(img, 25).compress()
